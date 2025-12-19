@@ -1,0 +1,113 @@
+# BARC_Prior_Sensitivity_Table.py
+"""
+Generates Table A2: Sensitivity of HCC Risk Assessment to Prior Specification.
+This script runs the Monte Carlo simulation for four different prior distributions
+and compiles the results into a comprehensive table.
+"""
+
+import numpy as np
+import scipy.stats as stats
+import pandas as pd
+
+def run_simulation_for_prior(alpha, beta, n_iter=10_000, seed=12345):
+    """
+    Runs the Monte Carlo simulation for a given Beta prior.
+    
+    Parameters:
+    alpha, beta (float): Parameters for the Beta(alpha, beta) prior.
+    n_iter (int): Number of Monte Carlo draws.
+    seed (int): Random seed for reproducibility.
+    
+    Returns:
+    tuple: (prior_mean, posterior_mean, ci_lower, ci_upper) as raw floats
+    """
+    np.random.seed(seed)
+    
+    # Sample from the specified Beta prior
+    prior_samples = stats.beta.rvs(alpha, beta, size=n_iter)
+    
+    # Sample Bayes factors (same evidence likelihood for all priors)
+    bf_mech   = stats.lognorm.rvs(s=0.5, scale=np.exp(0), size=n_iter)
+    bf_human  = stats.lognorm.rvs(s=0.2, scale=np.exp(np.log(3)), size=n_iter)
+    bf_animal = stats.lognorm.rvs(s=0.2, scale=np.exp(np.log(2)), size=n_iter)
+    
+    # Compute posterior probabilities
+    posterior_probs = []
+    for i in range(n_iter):
+        prior_odds = prior_samples[i] / (1 - prior_samples[i])
+        bf_total = bf_mech[i] * bf_human[i] * bf_animal[i]
+        post_odds = prior_odds * bf_total
+        post_prob = post_odds / (1 + post_odds)
+        posterior_probs.append(post_prob)
+    
+    posterior_probs = np.array(posterior_probs)
+    
+    # Calculate summary statistics (as raw floats, not percentages)
+    prior_mean = alpha / (alpha + beta)
+    posterior_mean = np.mean(posterior_probs)
+    ci_lower = np.percentile(posterior_probs, 2.5)
+    ci_upper = np.percentile(posterior_probs, 97.5)
+    
+    return prior_mean, posterior_mean, ci_lower, ci_upper
+
+# Main execution
+print("GENERATING TABLE A2: PRIOR SENSITIVITY ANALYSIS")
+print("=" * 85)
+
+# Define the four priors to test
+priors_to_test = [
+    {'name': 'Conservative (Regulatory)', 'alpha': 10, 'beta': 990},
+    {'name': 'Informed (Mechanistic)', 'alpha': 85, 'beta': 15},
+    {'name': 'Neutral', 'alpha': 50, 'beta': 50},
+    {'name': 'Non-informative', 'alpha': 1, 'beta': 1}
+]
+
+# Run simulation for each prior and collect results
+results = []
+for prior in priors_to_test:
+    print(f"Running simulation for {prior['name']} prior...")
+    
+    prior_mean, post_mean, ci_low, ci_high = run_simulation_for_prior(
+        prior['alpha'], 
+        prior['beta']
+    )
+    
+    # Store all values as floats, format only for display
+    results.append({
+        'Prior type': prior['name'],
+        'Prior Parameters': f"Beta({prior['alpha']},{prior['beta']})",
+        'Prior Mean': prior_mean,  # Store as float
+        'Posterior Mean': post_mean,  # Store as float
+        '95% CI Lower': ci_low,  # Store as float
+        '95% CI Upper': ci_high  # Store as float
+    })
+
+# Create DataFrame
+df = pd.DataFrame(results)
+
+# Format for display (without multiplying by 100 incorrectly)
+display_df = df.copy()
+display_df['Prior Mean'] = df['Prior Mean'].apply(lambda x: f"{x:.1%}")
+display_df['Posterior Mean'] = df['Posterior Mean'].apply(lambda x: f"{x:.2%}")
+display_df['95% Credible Interval'] = df.apply(
+    lambda row: f"({row['95% CI Lower']:.3%}, {row['95% CI Upper']:.3%})", 
+    axis=1
+)
+
+# Select only columns to display
+final_display = display_df[['Prior type', 'Prior Parameters', 'Prior Mean', 
+                           'Posterior Mean', '95% Credible Interval']]
+
+print("\n" + "=" * 85)
+print("TABLE A2: Sensitivity of HCC Risk Assessment to Prior Specification")
+print("=" * 85)
+print(final_display.to_string(index=False))
+print("=" * 85)
+
+# Save detailed results to CSV
+df.to_csv('BARC_Table_A2_Detailed_Results.csv', index=False)
+print("\nDetailed results saved to 'BARC_Table_A2_Detailed_Results.csv'")
+
+# Also save formatted version
+final_display.to_csv('BARC_Table_A2_Formatted.csv', index=False)
+print("Formatted table saved to 'BARC_Table_A2_Formatted.csv'")
