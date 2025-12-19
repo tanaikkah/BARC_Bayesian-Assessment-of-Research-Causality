@@ -1,0 +1,88 @@
+# BARC_Correlation_Adjustment.py
+"""
+Code to reproduce the sensitivity analysis for correlated evidence streams.
+Calculates the correction factor (C) and adjusted posterior probability
+for varying levels of correlation (rho).
+Matches the methodology in Appendix A.6.
+"""
+
+import numpy as np
+
+def calculate_correction_factor(rho, bayes_factors):
+    """
+    Calculate the correlation correction factor C(rho, BF).
+    
+    Parameters:
+    rho (float): Correlation coefficient between evidence streams.
+    bayes_factors (list): List of Bayes factors for each stream.
+    
+    Returns:
+    float: The correction factor C.
+    """
+    n = len(bayes_factors)
+    correction = 1.0
+    # Sum over all pairs of evidence streams (i < j)
+    for i in range(n):
+        for j in range(i + 1, n):
+            bf_i = bayes_factors[i]
+            bf_j = bayes_factors[j]
+            correction += rho * (np.sqrt(bf_i * bf_j) - 1)
+    return correction
+
+def adjusted_posterior_probability(prior_prob, bayes_factors, rho):
+    """
+    Calculate the correlation-adjusted posterior probability.
+    
+    Parameters:
+    prior_prob (float): Prior probability P(H).
+    bayes_factors (list): List of Bayes factors.
+    rho (float): Correlation coefficient.
+    
+    Returns:
+    float: Adjusted posterior probability.
+    """
+    prior_odds = prior_prob / (1 - prior_prob)
+    bf_total_independent = np.prod(bayes_factors) # BF under independence
+    
+    if rho == 0:
+        correction_factor = 1.0
+    else:
+        correction_factor = calculate_correction_factor(rho, bayes_factors)
+    
+    bf_total_adjusted = bf_total_independent / correction_factor
+    post_odds_adjusted = prior_odds * bf_total_adjusted
+    post_prob_adjusted = post_odds_adjusted / (1 + post_odds_adjusted)
+    
+    return post_prob_adjusted, bf_total_adjusted, correction_factor
+
+# --- Main Analysis, Reproducing Table A3 ---
+print("CORRELATION SENSITIVITY ANALYSIS")
+print("=" * 70)
+
+# Define baseline parameters (USE YOUR UPDATED BASELINE HERE)
+prior_prob = 0.01  # P(H) = 1.0%
+bayes_factors = [1.0, 3.0, 2.0]  # BF_mech, BF_human, BF_animal
+
+# Calculate baseline posterior under independence (rho=0)
+base_post_prob, base_bf, _ = adjusted_posterior_probability(prior_prob, bayes_factors, 0)
+
+print(f"Prior P(H): {prior_prob:.1%}")
+print(f"Bayes Factors (mech, human, animal): {bayes_factors}")
+print(f"\nPosterior under independence (ρ = 0): {base_post_prob:.3%}")
+print()
+
+# Define correlation levels to test
+correlation_levels = [0, 0.3, 0.5, 0.7, 0.9]
+
+print("Table A3: Effect of Varying Correlation Assumptions")
+print("-" * 70)
+print(f"{'Correlation (ρ)':<15} {'Correction Factor (C)':<25} {'Adjusted BF_total':<20} {'Posterior Probability':<20} {'Reduction':<10}")
+print("-" * 70)
+
+for rho in correlation_levels:
+    post_prob_adj, bf_adj, C = adjusted_posterior_probability(prior_prob, bayes_factors, rho)
+    reduction = 100 * (1 - (post_prob_adj / base_post_prob))
+    
+    print(f"{rho:<15.1f} {C:<25.3f} {bf_adj:<20.3f} {post_prob_adj:<20.3%} {reduction:<10.1f}%")
+
+print("=" * 70)
