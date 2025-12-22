@@ -1,77 +1,76 @@
 Repository Description
+This repository contains an illustrative Python implementation of BARC (Bayesian Assessment of Research Causality), a tiered Bayesian framework for integrating diverse evidence streams in environmental health research. The code implements the methodological workflows described in the accompanying manuscript:
+“Micro(nano)plastics and cancer link hypothesis: 
+applying the Bayesian assessment of research causality (BARC) framework for transparent evidence integration in public health”
 
-This repository contains the complete Python code for BARC (Bayesian Assessment of Research Causality), a tiered Bayesian framework for integrating diverse evidence streams in environmental health research. The code implements the methods described in the manuscript "Bayesian Assessment of Research Causality (BARC): A tiered framework for integrating mechanistic, animal, and human evidence."
-
+The repository is intended for methodological demonstration, education, and reproducible workflow illustration, not for direct regulatory or clinical decision-making.
+________________________________________
 File Contents
-
-A.8.1 Python code for illustrative Bayesian calculations
-
-Purpose: Simplified Bayes factor calculations for rapid evidence synthesis
+A.8.1 – Python Code for Illustrative Bayesian Calculations
+Purpose:
+Simplified Bayes factor–based calculations for rapid, screening-level evidence synthesis.
 Key features:
-
--Implements the core BARC likelihood ratio framework (Equation from Appendix A)
--Performs Bayesian updating for hypothesis probabilities
--Demonstrates evidence integration across mechanistic, animal, and human studies
--Includes worked examples with hypothetical data
--Use case: Quick screening-level assessments when computational resources or data are limited
-
-A.8.2 Python code for sensitivity analysis
-
-Purpose: Monte Carlo analysis of parameter sensitivity and robustness
+•	Implements a simplified likelihood ratio–based approximation of the BARC framework (Appendix A)
+•	Performs Bayesian updating of hypothesis probabilities
+•	Demonstrates integration across mechanistic, animal, and human evidence streams
+•	Includes worked examples using hypothetical data only
+Use case:
+Rapid conceptual screening or educational demonstrations when detailed likelihood models or computational resources are unavailable.
+________________________________________
+A.8.2 – Python Code for Sensitivity Analysis
+Purpose:
+Monte Carlo–based exploration of parameter sensitivity and robustness.
 Key features:
+•	Global sensitivity exploration via Monte Carlo sampling of parameter space
+•	Identification of influential assumptions and parameters
+•	Quantification of uncertainty propagation through the Bayesian workflow
+•	Generation of descriptive sensitivity summaries and visualizations (e.g., tornado-style plots)
+Use case:
+Understanding which modeling assumptions most strongly influence posterior conclusions.
 
--Global sensitivity analysis using Latin Hypercube Sampling
--Identifies influential parameters in the Bayesian framework
--Quantifies uncertainty propagation through the model
--Generates tornado plots and sensitivity indices
--Use case: Understanding which assumptions/parameters most affect conclusions
-
-A.8.3 Python code to reproduce sensitivity analysis for correlated evidence streams
-
-Purpose: Advanced sensitivity analysis accounting for evidence dependencies
+________________________________________
+A.8.3 – Python Code for Sensitivity Analysis with Correlated Evidence Streams
+Purpose:
+Illustrative sensitivity analysis accounting for dependent evidence sources.
 Key features:
-
--Extends A.8.2 to handle correlated evidence streams
--Implements covariance structures for dependent study results
--Demonstrates how correlation affects evidence weight
--Includes visualization of dependency effects
--Use case: Realistic sensitivity analysis when evidence streams are not independent
-
-B Python code_Hierarchical Bayesian Implementation
-
-Purpose: Full hierarchical Bayesian model with shared biological pathways
+•	Extension of A.8.2 to include illustrative covariance structures
+•	Demonstrates how correlation among evidence streams affects combined evidence weight
+•	Visualization of dependency effects on posterior inference
+Use case:
+Methodological exploration of non-independent evidence scenarios.
+________________________________________
+B – Python Code: Hierarchical Bayesian Implementation (Proof of Concept)
+Purpose:
+Demonstration of a full hierarchical Bayesian implementation of the BARC framework using simulated data.
 Key features:
-
--PyMC implementation of the hierarchical BARC framework
--Integrates measurement error models for exposure biomarkers
--Implements shared pathway parameters across evidence types
--Includes convergence diagnostics and visualization
--Note: This is a proof-of-concept demonstration using simulated data only
--Use case: Comprehensive evidence integration when detailed mechanistic understanding exists
-
+•	PyMC-based hierarchical model structure
+•	Shared biological pathway parameters across evidence types
+•	Measurement-error components for exposure biomarkers
+•	Diagnostic outputs illustrating model validation and failure modes
+Note:
+This model is intentionally under-regularized and uses simulated data to demonstrate diagnostic challenges (e.g., divergences, mixing issues) and the importance of rigorous Bayesian validation practices.
+Use case:
+Template for method development and educational illustration of hierarchical Bayesian evidence integration.
+________________________________________
 Implementation Tiers
-
-The code represents three implementation tiers:
-
-Tier 1 (A.8.1): Simplified Bayes factor calculations
-Tier 2 (A.8.2-3): Sensitivity analysis and robustness checking
-Tier 3 (B): Full hierarchical Bayesian implementation
+The repository reflects three implementation tiers within the BARC framework:
+•	Tier 1 (A.8.1): Simplified Bayes factor–based screening calculations
+•	Tier 2 (A.8.2–A.8.3): Sensitivity and robustness exploration
+•	Tier 3 (B): Hierarchical Bayesian proof-of-concept implementation
+________________________________________
 Important Notes
+⚠️ CRITICAL DISCLAIMERS
+•	All data in this repository are hypothetical and used solely for demonstration
+•	Code outputs illustrate workflow mechanics, not scientific or regulatory conclusions
+•	No real micro- or nanoplastics (MNPs) or cancer datasets are included
+•	This repository is a methodological and educational demonstration of Bayesian evidence integration
+________________________________________
+Usage Guidance
+•	Rapid screening: Use A.8.1 with externally derived Bayes factors
+•	Robustness exploration: Use A.8.2–A.8.3 to examine parameter sensitivity
+•	Method development: Use B as a conceptual template for hierarchical modeling
+•	Education: All files demonstrate Bayesian evidence synthesis principles
+________________________________________
+Reference
+If you use or adapt this code, please cite the accompanying manuscript.
 
-⚠️ CRITICAL DISCLAIMERS:
-
--All data in this repository are HYPOTHETICAL for demonstration purposes
--Code outputs show WORKFLOW, not scientific conclusions
--Appendix B intentionally shows model challenges (divergences, mixing issues) to illustrate diagnostic importance
--No real MNPs or cancer data are included - this is a methodological demonstration only
-
-Usage Instructions
-
--For rapid screening: Use A.8.1 with your own Bayes factors
--For robustness assessment: Run A.8.2-3 to test parameter sensitivity
--For method development: Study B as a template for hierarchical implementations
--For educational purposes: All files demonstrate Bayesian evidence integration concepts
-
-
-## Reference
-Please cite the accompanying manuscript if you use this code.
