@@ -1,0 +1,52 @@
+"""
+FOR DEMONSTRATION PURPOSES ONLY
+Illustrative implementation - not for production use
+All parameters are hypothetical
+"""
+
+# BARC Appendix A: Illustrative Bayesian Calculations
+# FOR DEMONSTRATION PURPOSES ONLY
+
+import numpy as np
+import scipy.stats as stats
+
+def run_illustrative_simulation(n_iter=10000, seed=12345):
+    """
+    Run Monte Carlo simulation for illustrative Bayesian updating.
+    Returns: prior_probs, posterior_probs
+    """
+    np.random.seed(seed)
+    
+    # Sample from skeptical prior
+    prior_probs = stats.beta.rvs(10, 990, size=n_iter)
+    
+    # Sample Bayes factors (illustrative distributions)
+    bf_mech = stats.lognorm.rvs(s=0.5, scale=np.exp(0), size=n_iter)
+    bf_human = stats.lognorm.rvs(s=0.2, scale=np.exp(np.log(3)), size=n_iter)
+    bf_animal = stats.lognorm.rvs(s=0.2, scale=np.exp(np.log(2)), size=n_iter)
+    
+    # Calculate posterior probabilities
+    posterior_probs = []
+    for i in range(n_iter):
+        prior_odds = prior_probs[i] / (1 - prior_probs[i])
+        bf_total = bf_mech[i] * bf_human[i] * bf_animal[i]
+        post_odds = prior_odds * bf_total
+        post_prob = post_odds / (1 + post_odds)
+        posterior_probs.append(post_prob)
+    
+    return np.array(prior_probs), np.array(posterior_probs)
+
+# Example usage
+if __name__ == "__main__":
+    print("BARC Appendix A: Illustrative Calculations")
+    print("=" * 60)
+    print("DISCLAIMER: This is a demonstration using hypothetical data.")
+    print("=" * 60)
+    
+    prior, posterior = run_illustrative_simulation()
+    
+    print(f"Prior P(H): {np.mean(prior):.3%} "
+          f"[{np.percentile(prior, 2.5):.3%}, {np.percentile(prior, 97.5):.3%}]")
+    print(f"Posterior P(H): {np.mean(posterior):.3%} "
+          f"[{np.percentile(posterior, 2.5):.3%}, {np.percentile(posterior, 97.5):.3%}]")
+    print(f"Illustrative fold increase: {np.mean(posterior)/np.mean(prior):.1f}x")
